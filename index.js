@@ -11,12 +11,11 @@ let userProfile = {};
             totalCaloriesBurned: 0
         };
 
-        // Diet plans data with detailed meal plans
         const dietPlans = {
             'weight-loss': {
                 vegetarian: {
                     dailyCalories: -500,
-                    description: "Calorie deficit plan with nutrient-rich vegetarian meals",
+                    description: "Calorie deficit plan with nutrient-rich plant-based meals and dairy",
                     meals: {
                         breakfast: ["Oats with berries and almonds", "Greek yogurt with nuts", "Vegetable poha", "Quinoa breakfast bowl"],
                         lunch: ["Lentil salad with vegetables", "Quinoa and chickpea bowl", "Vegetable soup with whole grain bread", "Grilled paneer with salad"],
@@ -38,12 +37,12 @@ let userProfile = {};
             'weight-gain': {
                 vegetarian: {
                     dailyCalories: 500,
-                    description: "Calorie surplus plan with protein-rich vegetarian meals for healthy weight gain",
+                    description: "Calorie surplus plan with protein-rich plant-based meals for healthy weight gain",
                     meals: {
-                        breakfast: ["Banana pancakes with nuts", "Oatmeal with dried fruits and honey", "Avocado toast with seeds", "Protein smoothie with banana"],
-                        lunch: ["Chickpea curry with rice", "Paneer butter masala with naan", "Lentil dal with ghee and rice", "Quinoa bowl with nuts"],
+                        breakfast: ["Banana pancakes with nuts and milk", "Oatmeal with dried fruits and honey", "Avocado toast with seeds", "Protein smoothie with banana and yogurt"],
+                        lunch: ["Chickpea curry with rice", "Paneer butter masala with naan", "Lentil dal with ghee and rice", "Quinoa bowl with nuts and cheese"],
                         dinner: ["Stuffed paratha with yogurt", "Vegetable biryani", "Paneer tikka with rice", "Mixed dal with bread"],
-                        snacks: ["Nuts and dried fruits", "Milkshake", "Cheese sandwich", "Energy balls"]
+                        snacks: ["Nuts and dried fruits", "Milkshake", "Cheese sandwich", "Energy balls with dates"]
                     }
                 },
                 'non-vegetarian': {
@@ -60,11 +59,11 @@ let userProfile = {};
             'maintenance': {
                 vegetarian: {
                     dailyCalories: 0,
-                    description: "Balanced vegetarian meals to maintain current weight",
+                    description: "Balanced plant-based meals with dairy to maintain current weight",
                     meals: {
                         breakfast: ["Whole grain cereal with milk", "Vegetable upma", "Oats with fruits", "Sprouted grain salad"],
                         lunch: ["Dal rice with vegetables", "Chapati with sabzi", "Vegetable pulao", "Quinoa salad"],
-                        dinner: ["Light vegetable curry with rice", "Soup with bread", "Grilled vegetables", "Lentil soup"],
+                        dinner: ["Light vegetable curry with rice", "Soup with bread", "Grilled vegetables with paneer", "Lentil soup"],
                         snacks: ["Fresh fruits", "Buttermilk", "Roasted seeds", "Herbal tea"]
                     }
                 },
@@ -81,24 +80,16 @@ let userProfile = {};
             }
         };
 
-        // Navigation function
         function showSection(sectionId) {
-            // Hide all sections
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.classList.remove('active'));
-            
-            // Hide all nav tabs active state
             const navTabs = document.querySelectorAll('.nav-tab');
             navTabs.forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected section
             document.getElementById(sectionId).classList.add('active');
             
-            // Activate selected nav tab
             event.target.classList.add('active');
         }
 
-        // BMR and calorie calculation
         function calculateBMR() {
             const name = document.getElementById('name').value;
             const age = parseInt(document.getElementById('age').value);
@@ -112,10 +103,8 @@ let userProfile = {};
                 return;
             }
 
-            // Store user profile
             userProfile = { name, age, gender, height, weight, activity };
 
-            // Calculate BMR using Mifflin-St Jeor Equation
             let bmr;
             if (gender === 'male') {
                 bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
@@ -123,7 +112,6 @@ let userProfile = {};
                 bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
             }
 
-            // Activity multipliers
             const activityMultipliers = {
                 'sedentary': 1.2,
                 'light': 1.375,
@@ -134,64 +122,55 @@ let userProfile = {};
 
             const tdee = bmr * activityMultipliers[activity];
 
-            // Calculate BMI
             const bmi = weight / ((height / 100) ** 2);
             
-            // Determine body category
             let category;
             if (bmi < 18.5) category = 'Underweight';
             else if (bmi < 25) category = 'Normal';
             else if (bmi < 30) category = 'Overweight';
             else category = 'Obese';
 
-            // Update display
             document.getElementById('bmi-value').textContent = bmi.toFixed(1);
             document.getElementById('bmr-value').textContent = Math.round(bmr);
             document.getElementById('tdee-value').textContent = Math.round(tdee);
             document.getElementById('category').textContent = category;
             document.getElementById('bmr-results').style.display = 'block';
 
-            // Store calculated values
             userProfile.bmr = bmr;
             userProfile.tdee = tdee;
             userProfile.bmi = bmi;
             userProfile.category = category;
 
-            // Add animation
+            progressData.startWeight = weight;
+            progressData.currentWeight = weight;
+
             document.getElementById('bmr-results').style.animation = 'fadeIn 0.8s ease';
         }
 
-        // Goal selection
         function selectGoal(goal) {
             selectedGoal = goal;
             
-            // Remove active class from all goal cards
             document.querySelectorAll('#diet-plan .diet-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            // Add active class to selected card
             event.target.classList.add('selected');
             
             updateDietRecommendations();
         }
 
-        // Diet preference selection
         function selectDiet(diet) {
             selectedDiet = diet;
             
-            // Remove active class from all diet cards
             document.querySelectorAll('#diet-plan .diet-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            // Add active class to selected card
             event.target.classList.add('selected');
             
             updateDietRecommendations();
         }
 
-        // Update diet recommendations
         function updateDietRecommendations() {
             if (selectedGoal && selectedDiet && userProfile.tdee) {
                 const plan = dietPlans[selectedGoal][selectedDiet];
@@ -206,7 +185,7 @@ let userProfile = {};
                                 <div style="color: #666;">Target Calories/Day</div>
                             </div>
                             <div style="text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 800; color: #667eea;">${Math.round(targetCalories * 0.25)}g</div>
+                                <div style="font-size: 2rem; font-weight: 800; color: #667eea;">${Math.round(targetCalories * 0.25 / 4)}g</div>
                                 <div style="color: #666;">Protein Goal</div>
                             </div>
                             <div style="text-align: center;">
@@ -247,7 +226,6 @@ let userProfile = {};
             }
         }
 
-        // Generate weekly plan
         function generateWeeklyPlan() {
             if (!selectedGoal || !selectedDiet || !userProfile.tdee) {
                 alert('Please complete your profile and select diet preferences first!');
@@ -305,12 +283,10 @@ let userProfile = {};
             
             document.getElementById('weekly-plan-content').innerHTML = weeklyContent;
             
-            // Auto-switch to weekly tab
             showSection('weekly');
             document.querySelector('[onclick="showSection(\'weekly\')"]').classList.add('active');
         }
 
-        // Calculator functions
         let calcDisplay = '0';
         let previousValue = null;
         let operation = null;
@@ -380,24 +356,6 @@ let userProfile = {};
             waitingForNewValue = true;
         }
 
-        // Override appendToDisplay for operators
-        document.querySelectorAll('.calc-btn.operator').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const op = this.textContent === '×' ? '*' : this.textContent;
-                
-                if (previousValue === null) {
-                    previousValue = parseFloat(calcDisplay);
-                } else if (operation !== null && !waitingForNewValue) {
-                    calculateResult();
-                    previousValue = parseFloat(calcDisplay);
-                }
-                
-                operation = op;
-                waitingForNewValue = true;
-            });
-        });
-
-        // Progress tracking functions
         function updateProgress() {
             const currentWeight = parseFloat(document.getElementById('current-weight').value);
             const targetWeight = parseFloat(document.getElementById('target-weight').value);
@@ -449,12 +407,10 @@ let userProfile = {};
             document.getElementById('days-tracked').textContent = progressData.daysTracked;
             document.getElementById('goal-progress').textContent = `${Math.round(goalProgress)}%`;
             
-            // Update progress bars
             document.getElementById('weight-progress-bar').style.width = `${Math.min(100, Math.abs(weightChange) * 10)}%`;
             document.getElementById('calorie-progress-bar').style.width = `${Math.min(100, Math.max(0, 50 + (calorieBalance / 100)))}%`;
             document.getElementById('goal-progress-bar').style.width = `${goalProgress}%`;
             
-            // Color coding for weight progress
             const weightElement = document.getElementById('weight-progress');
             if (weightChange > 0) {
                 weightElement.style.color = selectedGoal === 'weight-gain' ? '#4facfe' : '#ff6b6b';
@@ -464,14 +420,11 @@ let userProfile = {};
                 weightElement.style.color = '#4facfe';
             }
             
-            // Color coding for calorie balance
             const calorieElement = document.getElementById('calorie-balance');
             calorieElement.style.color = calorieBalance > 0 ? '#ff6b6b' : '#4facfe';
         }
 
-        // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
-            // Add smooth scrolling
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     this.style.animation = 'pulse 0.3s ease';
@@ -481,7 +434,6 @@ let userProfile = {};
                 });
             });
             
-            // Add hover effects to cards
             document.querySelectorAll('.card').forEach(card => {
                 card.addEventListener('mouseenter', function() {
                     this.style.transform = 'translateY(-5px)';
@@ -491,29 +443,22 @@ let userProfile = {};
                     this.style.transform = 'translateY(0)';
                 });
             });
-            
-            // Initialize progress data from user's initial weight if available
-            const initialWeight = localStorage.getItem('userInitialWeight');
-            if (initialWeight) {
-                progressData.startWeight = parseFloat(initialWeight);
-            }
+            document.querySelectorAll('.calc-btn.operator').forEach(btn => {
+                if (!btn.textContent.includes('=')) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const op = this.textContent === '×' ? '*' : this.textContent;
+                        
+                        if (previousValue === null) {
+                            previousValue = parseFloat(calcDisplay);
+                        } else if (operation !== null && !waitingForNewValue) {
+                            calculateResult();
+                            previousValue = parseFloat(calcDisplay);
+                        }
+                        
+                        operation = op;
+                        waitingForNewValue = true;
+                    });
+                }
+            });
         });
-
-        // Save user's initial weight when profile is completed
-        function saveInitialWeight() {
-            const weight = document.getElementById('weight').value;
-            if (weight) {
-                localStorage.setItem('userInitialWeight', weight);
-                progressData.startWeight = parseFloat(weight);
-            }
-        }
-
-        // Add this to the calculateBMR function
-        function calculateBMR() {
-            // ... existing code ...
-            
-            // Save initial weight
-            saveInitialWeight();
-            
-            // ... rest of existing code ...
-        }
